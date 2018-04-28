@@ -3,6 +3,8 @@ package CommonClass;
 public enum Flag {
     Success,
     UserNameUsed,
-    Failed
+    Failed,
+    ErrorPassword,
+    IllegalUsrName
 }
 

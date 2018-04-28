@@ -2,12 +2,14 @@ package MySql;
 //import java.util.*;
 //import oracle.jdbc.driver.OracleDriver;
 import java.sql.*;
-import CommonClass.Usr;
+
+import CommonClass.Datagram;
+
 //import java.math.*;
 public class RegisterSql {
 
 	
-	public static int RegisterVerify(Usr user) {
+	public static int RegisterVerify(Datagram user) {
 		//-1 注册失败 1 注册成功 0 用户名存在
 		String name=user.GetName();
 		String pass=user.GetPass();

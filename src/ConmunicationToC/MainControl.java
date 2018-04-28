@@ -1,5 +1,6 @@
 package ConmunicationToC;
 import CommonClass.*;
+import MySql.LoginSql;
 //import CommonClass.CommandIndex;
 import MySql.RegisterSql;
 import java.io.InputStream;
@@ -62,32 +63,41 @@ class ServerHandleThread implements Runnable{
         try {    
         	while(true) {
             //readObject()方法必须保证服务端和客户端的User包名一致，要不然会出现找不到类的错误
-        		System.out.println("1");
         		
-            Usr user=(Usr) ois.readObject();
+            Datagram datagram=(Datagram) ois.readObject();
             //socket.shutdownInput();
-            System.out.println("客户端发送的对象："+user);
-            CommandIndex command=user.GetCommand();
+            System.out.println("客户端发送的对象："+datagram);
+            CommandIndex command=datagram.GetCommand();
             switch(command) {
-            case Login:{
-
-            }
-            case Register:
-            	int result=RegisterSql.RegisterVerify(user);
-            	Response response=new Response(Flag.Success);
+            case Register:{
+            	int result=RegisterSql.RegisterVerify(datagram);	
+            	Datagram response=new Datagram(Flag.Success);
                 //socket.shutdownInput();// 禁用套接字的输入流
                 if(result==1) response.SetFlag(Flag.Success);
                 else if(result==-1) response.SetFlag(Flag.UserNameUsed);
+                else response.SetFlag(Flag.Failed);
+                oos.writeObject(response); 
+            }
+            case Login:{
+            	int result=LoginSql.Login_Sql(datagram);       
+            	Datagram response=new Datagram(Flag.Success);
+                //socket.shutdownInput();// 禁用套接字的输入流
+                if(result==1) response.SetFlag(Flag.Success);
+                else if(result==-1) response.SetFlag(Flag.ErrorPassword);
+                else if(result==0)  response.SetFlag(Flag.IllegalUsrName);
                 else response.SetFlag(Flag.Failed);
                 oos.writeObject(response);
                 //socket.shutdownInput();
                 //pw.flush();
                 //socket.shutdownOutput();
             }
-        	}
-                      
+            case FriendRequest:{
+            	System.out.println("FriendRequest");
+            }
+           }
+        }         
         } catch (IOException | ClassNotFoundException e) {
-            // TODO Auto-generated catch block
+            // TODO Auto-generated catch block        	
             e.printStackTrace();
         }finally{
             try{
